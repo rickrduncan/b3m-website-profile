@@ -224,4 +224,4 @@ function b3m_get_site_settings( $atts ) {
     
     return b3m_get_theme_option( $atts['item'] );
 }
-add_shortcode( 'site-setting', 'b3m_get_site_settings' );
+add_shortcode( 'site-setting', 'b3m_get_site_settings' ); 
