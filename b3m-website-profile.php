@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: 	B3M Website Profile
-Plugin URI: 	http://rickrduncan.com/free-plugins/b3m-website-profile-999
+Plugin URI: 	http://rickrduncan.com/free-plugins
 Description: 	This plugin creates a simple admin menu and options panel to host website profile settings such as phone number and social media URLs.
 Author: 		Rick R. Duncan
 Author URI: 	http://rickrduncan.com
@@ -225,19 +225,3 @@ function b3m_get_site_settings( $atts ) {
     return b3m_get_theme_option( $atts['item'] );
 }
 add_shortcode( 'site-setting', 'b3m_get_site_settings' );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
