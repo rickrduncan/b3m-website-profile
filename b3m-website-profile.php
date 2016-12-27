@@ -1,11 +1,14 @@
 <?php
-/*
-Plugin Name: 	B3M Website Profile
-Plugin URI: 	http://rickrduncan.com/free-plugins
-Description: 	This plugin creates a simple admin menu and options panel to host website profile settings such as phone number and social media URLs.
-Author: 		Rick R. Duncan
-Author URI: 	http://rickrduncan.com
-Source: 		http://www.wpexplorer.com/wordpress-theme-options/
+/**
+* Plugin Name:		B3M Website Profile
+* Description:		This plugin creates a simple admin menu and options panel to host website profile settings such as company name, phone number and social media URLs.
+* Author:			Rick R. Duncan - B3Marketing, LLC
+* Author URI:		http://rickrduncan.com
+*
+* License:			GPLv3
+* License URI:		https://www.gnu.org/licenses/gpl-3.0.html
+*
+* Version:			2.0.0
 */
 
 
@@ -40,7 +43,7 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 		 * @since 1.0.0
 		 */
 		public static function get_theme_options() {
-			return get_option( 'theme_options' );
+			return get_option( 'b3m_website_options' );
 		}
 
 		/**
@@ -62,10 +65,10 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 		 */
 		public static function add_admin_menu() {
 			add_menu_page(
-				esc_html__( 'Website Profile', 'text-domain' ),
-				esc_html__( 'Website Profile', 'text-domain' ),
+				__( 'Website Profile' ),
+				__( 'Website Profile' ),
 				'manage_options',
-				'theme-settings',
+				'website-profile',
 				array( 'B3M_Website_Profile', 'create_admin_page' )
 			);
 		}
@@ -79,7 +82,7 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 		 * @since 1.0.0
 		 */
 		public static function register_settings() {
-			register_setting( 'theme_options', 'theme_options', array( 'B3M_Website_Profile', 'sanitize' ) );
+			register_setting( 'b3m_website_options', 'b3m_website_options', array( 'B3M_Website_Profile', 'sanitize' ) );
 		}
 
 		/**
@@ -92,6 +95,18 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 			// If we have options lets sanitize them
 			if ( $options ) {
 
+				if ( ! empty( $options['company-name'] ) ) {
+					$options['company-name'] = sanitize_text_field( $options['company-name'] );
+				} else {
+					unset( $options['company-name'] ); // Remove from options if empty
+				}
+
+				if ( ! empty( $options['company-address'] ) ) {
+					$options['company-address'] = esc_textarea( $options['company-address'] );
+				} else {
+					unset( $options['company-address'] ); // Remove from options if empty
+				}
+
 				if ( ! empty( $options['phone'] ) ) {
 					$options['phone'] = sanitize_text_field( $options['phone'] );
 				} else {
@@ -101,7 +116,7 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 				if ( ! empty( $options['email'] ) ) {
 					$options['email'] = sanitize_text_field( $options['email'] );
 				} else {
-					unset( $options['phone'] ); // Remove from options if empty
+					unset( $options['email'] ); // Remove from options if empty
 				}
 
 				if ( ! empty( $options['facebook'] ) ) {
@@ -137,52 +152,67 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 
 			<div class="wrap">
 
-				<h1><?php esc_html_e( 'Website Profile for '.get_option( 'blogname' ).'', 'text-domain' ); ?></h1>
+				<h1><?php echo ( 'Website Profile for '.get_option( 'blogname' ) ); ?></h1>
 
 				<form method="post" action="options.php">
 
-					<?php settings_fields( 'theme_options' ); ?>
+					<?php settings_fields( 'b3m_website_options' ); ?>
 
 					<table class="form-table">
-
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Phone Number', 'text-domain' ); ?></th>
+							<th scope="row"><?php echo( 'Company Name' ); ?></th>
+							<td>
+								<?php $value = self::get_theme_option( 'company-name' ); ?>
+								<input class="regular-text" type="text" name="b3m_website_options[company-name]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="company-name"]</p>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php echo( 'Company Address' ); ?></th>
+							<td>
+								<?php $value = self::get_theme_option( 'company-address' ); ?>
+								<textarea class="regular-text" rows="3" name="b3m_website_options[company-address]"><?php echo esc_html( $value ); ?></textarea>
+								<p id="tagline-description" class="description">[website-profile item="company-address"]</p>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row"><?php echo( 'Phone Number' ); ?></th>
 							<td>
 								<?php $value = self::get_theme_option( 'phone' ); ?>
-								<input class="regular-text" type="text" name="theme_options[phone]" value="<?php echo esc_attr( $value ); ?>">
-								<p id="tagline-description" class="description">Shortcode useage: [site-setting item="phone"]</p>
+								<input class="regular-text" type="text" name="b3m_website_options[phone]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="phone"]</p>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Email Address', 'text-domain' ); ?></th>
+							<th scope="row"><?php echo( 'Email Address' ); ?></th>
 							<td>
 								<?php $value = self::get_theme_option( 'email' ); ?>
-								<input class="regular-text" type="email" name="theme_options[email]" value="<?php echo esc_attr( $value ); ?>">
-								<p id="tagline-description" class="description">Shortcode useage: [site-setting item="email"]</p>
+								<input class="regular-text" type="email" name="b3m_website_options[email]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="email"]</p>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Facebook URL', 'text-domain' ); ?></th>
+							<th scope="row"><?php echo( 'Facebook URL' ); ?></th>
 							<td>
 								<?php $value = self::get_theme_option( 'facebook' ); ?>
-								<input class="regular-text" type="url" name="theme_options[facebook]" value="<?php echo esc_attr( $value ); ?>">
-								<p id="tagline-description" class="description">Shortcode useage: [site-setting item="facebook"]</p>
+								<input class="regular-text" type="url" name="b3m_website_options[facebook]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="facebook"]</p>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'LinkedIn URL', 'text-domain' ); ?></th>
+							<th scope="row"><?php echo ( 'LinkedIn URL' ); ?></th>
 							<td>
 								<?php $value = self::get_theme_option( 'linkedin' ); ?>
-								<input class="regular-text" type="url" name="theme_options[linkedin]" value="<?php echo esc_attr( $value ); ?>">
-								<p id="tagline-description" class="description">Shortcode useage: [site-setting item="linkedin"]</p>
+								<input class="regular-text" type="url" name="b3m_website_options[linkedin]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="linkedin"]</p>
 							</td>
 						</tr>
 						<tr valign="top">
-							<th scope="row"><?php esc_html_e( 'Twitter URL', 'text-domain' ); ?></th>
+							<th scope="row"><?php echo ( 'Twitter URL' ); ?></th>
 							<td>
 								<?php $value = self::get_theme_option( 'twitter' ); ?>
-								<input class="regular-text" type="url" name="theme_options[twitter]" value="<?php echo esc_attr( $value ); ?>">
-								<p id="tagline-description" class="description">Shortcode useage: [site-setting item="twitter"]</p>
+								<input class="regular-text" type="url" name="b3m_website_options[twitter]" value="<?php echo esc_attr( $value ); ?>">
+								<p id="tagline-description" class="description">[website-profile item="twitter"]</p>
 							</td>
 						</tr>
 					</table>
@@ -206,7 +236,7 @@ new B3M_Website_Profile();
  * @since 1.0.0
  *
  */
-function b3m_get_theme_option( $id = '' ) {
+function b3m_get_website_profile_options( $id = '' ) {
 	return B3M_Website_Profile::get_theme_option( $id );
 }
 
@@ -214,14 +244,15 @@ function b3m_get_theme_option( $id = '' ) {
 /**
  *
  * Retrieve a setting using shortcode
- * To return the phone number: [site-setting item="phone"]
+ * To return the phone number: [website-profile item="phone"]
  * 
  *
  * @since 1.0.0
  *
  */
-function b3m_get_site_settings( $atts ) {
+function b3m_website_profile_shortcode( $atts ) {
     
-    return b3m_get_theme_option( $atts['item'] );
+    return nl2br( b3m_get_website_profile_options( $atts['item'] ) );
 }
-add_shortcode( 'site-setting', 'b3m_get_site_settings' ); 
+add_shortcode( 'website-profile', 'b3m_website_profile_shortcode' );
+
