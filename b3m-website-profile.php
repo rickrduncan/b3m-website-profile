@@ -8,7 +8,7 @@
 * License:			GPLv3
 * License URI:		https://www.gnu.org/licenses/gpl-3.0.html
 *
-* Version:			2.0.0
+* Version:			2.1.0
 */
 
 
@@ -31,10 +31,25 @@ if ( ! class_exists( 'B3M_Website_Profile' ) ) {
 
 			// We only need to register the admin panel on the back-end
 			if ( is_admin() ) {
+				
+				$plugin = plugin_basename( __FILE__ );
+				add_filter( "plugin_action_links_$plugin", 'b3m_wp_add_settings_link' );
+				
 				add_action( 'admin_menu', array( 'B3M_Website_Profile', 'add_admin_menu' ) );
 				add_action( 'admin_init', array( 'B3M_Website_Profile', 'register_settings' ) );
 			}
-
+			
+			/**
+			* Add plugin 'Settings' link to the plugins page
+			*
+			* @since 2.1.0
+			*/
+			function b3m_wp_add_settings_link( $links ) {
+				$settings_link = '<a href="admin.php?page=website-profile">' . __( 'Settings' ) . '</a>';
+				array_unshift($links, $settings_link);
+				
+				return $links;
+			}
 		}
 
 		/**
